@@ -1,0 +1,9 @@
+steps:
+  - name: ":rubocop:"
+    command: bin/rubocop
+    timeout_in_minutes: 30
+
+  - name: ":rspec:"
+    command: bin/test
+    timeout_in_minutes: 30
+    artifact_paths: cache.tar.lz4

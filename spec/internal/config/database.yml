@@ -1,6 +1,10 @@
 test:
   adapter: postgresql
+  <% if ENV["DATABASE_URL"] %>
+  url: <%= ENV["DATABASE_URL"] %>
+  <% else %>
   database: zero_downtime_migrations
   encoding: unicode
   pool: 5
   username: <%= ENV.fetch("USER") %>
+  <% end %>

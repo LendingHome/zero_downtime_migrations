@@ -1,0 +1,32 @@
+version: "2"
+
+services:
+  app:
+    build:
+      context: "."
+    image: $DOCKER_IMAGE
+    depends_on:
+      - postgres
+    environment:
+      - CI
+      - DATABASE_URL=postgres://postgres@postgres/zero_downtime_migrations
+      - DOCKER=true
+      - RACK_ENV=test
+      - RAILS_ENV=test
+      - REBUILD_CACHE
+    links:
+      - postgres
+    volumes:
+      - .:/app
+      - $BUILD_CACHE/bundler:/app/vendor/bundle
+      - $BUILD_CACHE/tmp:/app/tmp/cache
+
+  postgres:
+    image: lendinghome/postgres:9.4.8
+
+  rubocop:
+    image: lendinghome/rubocop
+    environment:
+      - RUBOCOP_VERSION=2.3
+    volumes:
+      - .:/app

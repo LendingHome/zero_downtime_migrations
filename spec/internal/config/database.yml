@@ -1,0 +1,6 @@
+test:
+  adapter: postgresql
+  database: zero_downtime_migrations
+  encoding: unicode
+  pool: 5
+  username: <%= ENV.fetch("USER") %>

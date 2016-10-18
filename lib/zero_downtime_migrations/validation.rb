@@ -2,7 +2,7 @@ module ZeroDowntimeMigrations
   class Validation
     attr_reader :migration, :args
 
-    def initialize(migration, args)
+    def initialize(migration, *args)
       @migration = migration
       @args = args
     end

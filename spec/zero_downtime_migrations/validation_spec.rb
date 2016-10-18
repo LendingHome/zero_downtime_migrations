@@ -1,8 +1,8 @@
 RSpec.describe ZeroDowntimeMigrations::Validation do
-  subject { described_class.new(migration, args) }
+  subject { described_class.new(migration, *args) }
 
   let(:migration) { double("migration") }
-  let(:args) { double("args") }
+  let(:args) { [] }
 
   describe "#args" do
     it "returns the initialized args" do

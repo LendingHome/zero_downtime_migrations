@@ -38,7 +38,7 @@ module ZeroDowntimeMigrations
     def method_missing(method, *args)
       unless loading_schema? || reverse_migration? || rollup_migration? || safe?
         validator = "#{namespace}::#{method.to_s.classify}".safe_constantize
-        validator.new(self, args).validate! if validator
+        validator.new(self, *args).validate! if validator
       end
 
       super

@@ -2,14 +2,14 @@
 
 Zero downtime migrations with ActiveRecord and PostgreSQL. Catch problematic migrations at development/test time!
 
-Heavily insprired by the similar projects listed below. Our intent was to target PostgreSQL specific issues and provide clearer instructions on how to perform the migrations the "zero downtime way".
+Heavily inspired by these similar projects:
 
 * https://github.com/ankane/strong_migrations
 * https://github.com/foobarfighter/safe-migrations
 
 ## Installation
 
-Simply add the gem to the project `Gemfile`. Ensure that it's only added to the `development` and `test` groups.
+Simply add the gem to the project `Gemfile`. Ensure that it's only **added to the `development` and `test`** groups.
 
 ```ruby
 gem "zero_downtime_migrations", only: %i(development test)
@@ -17,7 +17,9 @@ gem "zero_downtime_migrations", only: %i(development test)
 
 ## Usage
 
-This gem will automatically raise exceptions when potential database locking migrations are detected. It checks for common things like:
+This gem will automatically **raise exceptions when potential database locking migrations are detected**.
+
+It checks for common things like:
 
 * Adding a column with a default
 * Adding a non-concurrent index
@@ -25,7 +27,7 @@ This gem will automatically raise exceptions when potential database locking mig
 * Performing data or schema migrations with the DDL transaction disabled
 * Using `each` instead of `find_each` to loop thru `ActiveRecord` objects
 
-These exceptions display clear instructions of how to perform the same operation the "zero downtime way".
+These exceptions display very clear instructions of how to perform the same operation the "zero downtime way".
 
 ## Disabling exceptions
 
@@ -41,16 +43,16 @@ class AddPublishedToPosts < ActiveRecord::Migration[5.0]
 end
 ```
 
-We can also disable the exceptions by setting `ENV["SAFETY_ASSURED"]` when running migrations.
+We can also globally disable the exceptions by setting `ENV["SAFETY_ASSURED"]` when running migrations.
 
 ```bash
 SAFETY_ASSURED=1 bundle exec rake db:migrate --trace
 ```
 
-These enforcements are automatically disabled by default for the following scenarios:
+These enforcements are **automatically disabled by default for the following scenarios**:
 
-* We're loading the database schema with `rake db:schema:load` instead of `db:migrate`
-* We're migrating down (reverting a migration)
+* The database schema is being loaded with `rake db:schema:load` instead of `db:migrate`
+* The current migration is a reverse (down) migration
 
 ## Validations
 

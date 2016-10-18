@@ -10,7 +10,7 @@ Heavily inspired by these similar projects:
 
 ## Installation
 
-Simply add the gem to the project `Gemfile`. Ensure that it's only **added to the `development` and `test`** groups.
+Simply add this gem to the project `Gemfile` under the **`development` and `test`** groups.
 
 ```ruby
 gem "zero_downtime_migrations", only: %i(development test)
@@ -28,7 +28,7 @@ It checks for common things like:
 * Performing data or schema migrations with the DDL transaction disabled
 * Using `each` instead of `find_each` to loop thru `ActiveRecord` objects
 
-These exceptions display very clear instructions of how to perform the same operation the "zero downtime way".
+These exceptions display clear instructions of how to perform the same operation the "zero downtime way".
 
 ## Disabling exceptions
 

@@ -178,8 +178,10 @@ end
 
 ```ruby
 class IndexPublishedOnPosts < ActiveRecord::Migration[5.0]
+  disable_ddl_transaction!
+
   def change
-    add_index :posts, :published
+    add_index :posts, :published, algorithm: :concurrently
   end
 end
 ```

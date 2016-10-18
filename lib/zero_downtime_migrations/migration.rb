@@ -94,7 +94,7 @@ module ZeroDowntimeMigrations
     end
 
     def validate(type, *args)
-      Validation.validate!(type, self, *args) if Migration.unsafe?
+      Validation.validate!(type, self, *args)
     end
   end
 end

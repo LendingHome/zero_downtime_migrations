@@ -1,4 +1,4 @@
-RSpec.describe ZeroDowntimeMigrations::Relation do
+RSpec.describe ZeroDowntimeMigrations::Validation::FindEach do
   let(:error) { ZeroDowntimeMigrations::UnsafeMigrationError }
 
   context "with data migrations using each" do

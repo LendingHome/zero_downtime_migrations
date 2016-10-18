@@ -4,6 +4,14 @@ RSpec.describe ZeroDowntimeMigrations::Validation do
   let(:migration) { double("migration") }
   let(:args) { [] }
 
+  describe ".validate!" do
+    let(:error) { ZeroDowntimeMigrations::UndefinedValidationError }
+
+    it "raises UndefinedValidationError if one does not exist" do
+      expect { described_class.validate!(:invalid) }.to raise_error(error)
+    end
+  end
+
   describe "#args" do
     it "returns the initialized args" do
       expect(subject.args).to eq(args)

@@ -22,6 +22,10 @@ module ZeroDowntimeMigrations
       raise UnsafeMigrationError.new(*args)
     end
 
+    def migration_name
+      migration.class.name
+    end
+
     def options
       args.last.is_a?(Hash) ? args.last : {}
     end

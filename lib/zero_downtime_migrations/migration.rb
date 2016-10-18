@@ -1,15 +1,35 @@
 module ZeroDowntimeMigrations
   module Migration
+    class << self
+      attr_accessor :migrating, :safe
+
+      def migrating?
+        !!@migrating
+      end
+
+      def safe?
+        !!@safe || ENV["SAFETY_ASSURED"].presence
+      end
+
+      def unsafe?
+        !safe?
+      end
+    end
+
     def ddl_disabled?
       !!disable_ddl_transaction
     end
 
     def migrate(direction)
+      Migration.migrating = true
+      Migration.safe = false
       @direction = direction
-      super
+      super.tap { Migration.migrating = false }
     end
 
     private
+
+    delegate :safe?, to: Migration
 
     def loading_schema?
       is_a?(ActiveRecord::Schema)
@@ -37,15 +57,11 @@ module ZeroDowntimeMigrations
     end
 
     def safety_assured
-      safe = @safe
-      @safe = true
+      safe = Migration.safe
+      Migration.safe = true
       yield
     ensure
-      @safe = safe
-    end
-
-    def safe?
-      !!(@safe || ENV["SAFE_MIGRATION"].presence)
+      Migration.safe = safe
     end
   end
 end

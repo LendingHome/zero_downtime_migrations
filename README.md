@@ -22,6 +22,7 @@ This gem will automatically raise exceptions when potential database locking mig
 * Adding a column with a default
 * Adding a non-concurrent index
 * Mixing data changes with schema migrations
+* Using `each` instead of `find_each`
 
 These exceptions display clear instructions of how to perform the same operation the "zero downtime way".
 
@@ -113,6 +114,32 @@ class IndexUsersOnEmail < ActiveRecord::Migration[5.0]
 
   def change
     add_index :users, :email, algorithm: :concurrently
+  end
+end
+```
+
+### Looping thru `ActiveRecord::Base` objects
+
+#### Bad
+
+```ruby
+class BackportPublishedDefaultOnPosts < ActiveRecord::Migration[5.0]
+  def change
+    Post.all.each do |post|
+      post.update_attribute(published: true)
+    end
+  end
+end
+```
+
+#### Good
+
+```ruby
+class BackportPublishedDefaultOnPosts < ActiveRecord::Migration[5.0]
+  def change
+    Post.all.find_each do |post|
+      post.update_attribute(published: true)
+    end
   end
 end
 ```

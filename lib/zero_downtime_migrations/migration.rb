@@ -1,46 +1,73 @@
 module ZeroDowntimeMigrations
   module Migration
-    class << self
-      attr_accessor :migrating, :safe
-
-      def migrating?
-        !!@migrating
-      end
-
-      def safe?
-        !!@safe || ENV["SAFETY_ASSURED"].presence
-      end
-
-      def unsafe?
-        !safe?
-      end
-    end
+    extend DSL
 
     def ddl_disabled?
       !!disable_ddl_transaction
     end
 
-    def migrate(direction)
+    def define(*)
       Migration.migrating = true
-      Migration.safe = false
+      Migration.safe = true
+      super
+    end
+
+    def migrate(direction)
       @direction = direction
-      super.tap { Migration.migrating = false }
+
+      Migration.data = false
+      Migration.ddl = false
+      Migration.index = false
+      Migration.migrating = true
+      Migration.safe = reverse_migration? || rollup_migration?
+
+      super.tap do
+        validate(:mixed_migration)
+        Migration.migrating = false
+      end
     end
 
     private
 
-    delegate :safe?, to: Migration
+    def ddl_method?(method)
+      %i(
+        add_belongs_to
+        add_column
+        add_foreign_key
+        add_reference
+        add_timestamps
+        change_column
+        change_column_default
+        change_column_null
+        change_table
+        create_join_table
+        create_table
+        drop_join_table
+        drop_table
+        remove_belongs_to
+        remove_column
+        remove_columns
+        remove_foreign_key
+        remove_index
+        remove_index!
+        remove_reference
+        remove_timestamps
+        rename_column
+        rename_column_indexes
+        rename_index
+        rename_table
+        rename_table_indexes
+      ).include?(method)
+    end
 
-    def loading_schema?
-      is_a?(ActiveRecord::Schema)
+    def index_method?(method)
+      %i(add_index).include?(method)
     end
 
     def method_missing(method, *args)
-      unless loading_schema? || reverse_migration? || rollup_migration? || safe?
-        validator = "#{namespace}::#{method.to_s.classify}".safe_constantize
-        validator.new(self, *args).validate! if validator
-      end
-
+      Migration.ddl = true if ddl_method?(method)
+      Migration.index = true if index_method?(method)
+      validate(method, *args)
       super
     end
 
@@ -62,6 +89,14 @@ module ZeroDowntimeMigrations
       yield
     ensure
       Migration.safe = safe
+    end
+
+    def validate(type, *args)
+      unless Migration.safe?
+        validator = "#{namespace}::#{type.to_s.classify}".safe_constantize
+        validator ||= namespace::Noop
+        validator.new(self, *args).validate!
+      end
     end
   end
 end

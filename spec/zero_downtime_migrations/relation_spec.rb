@@ -1,13 +1,6 @@
 RSpec.describe ZeroDowntimeMigrations::Relation do
   let(:error) { ZeroDowntimeMigrations::UnsafeMigrationError }
 
-  before(:all) do
-    class User < ActiveRecord::Base
-    end
-  end
-
-  after(:all) { Object.send(:remove_const, :User) }
-
   context "with data migrations using each" do
     let(:migration) do
       Class.new(ActiveRecord::Migration[5.0]) do
@@ -33,7 +26,7 @@ RSpec.describe ZeroDowntimeMigrations::Relation do
       end
     end
 
-    it "raises an unsafe migration error" do
+    it "does not raise an unsafe migration error" do
       expect { migration.migrate(:up) }.not_to raise_error(error)
     end
   end

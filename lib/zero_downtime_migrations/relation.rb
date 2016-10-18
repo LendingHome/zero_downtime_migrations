@@ -1,5 +1,7 @@
 module ZeroDowntimeMigrations
   module Relation
+    prepend Data
+
     def each(*)
       return super unless Migration.migrating? && Migration.unsafe?
       error = "Using ActiveRecord::Relation#each is unsafe!"

@@ -16,6 +16,7 @@ module ZeroDowntimeMigrations
     end
 
     def validate!
+      return if Migration.safe?
       raise NotImplementedError
     end
   end

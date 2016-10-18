@@ -67,6 +67,7 @@ These enforcements are **automatically disabled by default for the following sce
 
 * The database schema is being loaded with `rake db:schema:load` instead of `db:migrate`
 * The current migration is a reverse (down) migration
+* The current migration is named `RollupMigrations`
 
 ## Validations
 

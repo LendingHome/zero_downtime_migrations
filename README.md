@@ -30,45 +30,6 @@ It checks for common things like:
 
 These exceptions display clear instructions of how to perform the same operation the "zero downtime way".
 
-## Disabling exceptions
-
-We can disable any of these "zero downtime migration" enforcements by wrapping them in a `safety_assured` block.
-
-```ruby
-class AddPublishedToPosts < ActiveRecord::Migration[5.0]
-  def change
-    safety_assured do
-      add_column :posts, :published, :boolean, default: true
-    end
-  end
-end
-```
-
-We can also mark an entire migration as safe by using the `safety_assured` helper method.
-
-```ruby
-class AddPublishedToPosts < ActiveRecord::Migration[5.0]
-  safety_assured
-  
-  def change
-    add_column :posts, :published, :boolean
-    Post.where("created_at >= ?", 1.day.ago).update_all(published: true)
-  end
-end
-```
-
-Enforcements can be globally disabled by setting `ENV["SAFETY_ASSURED"]` when running migrations.
-
-```bash
-SAFETY_ASSURED=1 bundle exec rake db:migrate --trace
-```
-
-These enforcements are **automatically disabled by default for the following scenarios**:
-
-* The database schema is being loaded with `rake db:schema:load` instead of `db:migrate`
-* The current migration is a reverse (down) migration
-* The current migration is named `RollupMigrations`
-
 ## Validations
 
 ### Adding a column with a default
@@ -252,6 +213,45 @@ end
 * Removing a column
 * Renaming a column
 * Renaming a table
+
+## Disabling "zero downtime migration" enforcements
+
+We can disable any of these "zero downtime migration" enforcements by wrapping them in a `safety_assured` block.
+
+```ruby
+class AddPublishedToPosts < ActiveRecord::Migration[5.0]
+  def change
+    safety_assured do
+      add_column :posts, :published, :boolean, default: true
+    end
+  end
+end
+```
+
+We can also mark an entire migration as safe by using the `safety_assured` helper method.
+
+```ruby
+class AddPublishedToPosts < ActiveRecord::Migration[5.0]
+  safety_assured
+
+  def change
+    add_column :posts, :published, :boolean
+    Post.where("created_at >= ?", 1.day.ago).update_all(published: true)
+  end
+end
+```
+
+Enforcements can be globally disabled by setting `ENV["SAFETY_ASSURED"]` when running migrations.
+
+```bash
+SAFETY_ASSURED=1 bundle exec rake db:migrate --trace
+```
+
+These enforcements are **automatically disabled by default for the following scenarios**:
+
+* The database schema is being loaded with `rake db:schema:load` instead of `db:migrate`
+* The current migration is a reverse (down) migration
+* The current migration is named `RollupMigrations`
 
 ## Testing
 

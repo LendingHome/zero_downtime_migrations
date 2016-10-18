@@ -1,4 +1,4 @@
-# zero_downtime_migrations
+# ![LendingHome](https://cloud.githubusercontent.com/assets/2419/19467866/7efa93a8-94c8-11e6-93e7-4375dbb8a7bc.png) zero_downtime_migrations
 
 Zero downtime migrations with ActiveRecord and PostgreSQL. Catch problematic migrations at development/test time!
 

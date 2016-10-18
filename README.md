@@ -265,6 +265,10 @@ bundle exec rspec
 * Commit, do not mess with the version or history.
 * Open a pull request. Bonus points for topic branches.
 
+## Authors
+
+* [Sean Huber](https://github.com/shuber)
+
 ## License
 
 [MIT](https://github.com/lendinghome/zero_downtime_migrations/blob/master/LICENSE) - Copyright © 2016 LendingHome

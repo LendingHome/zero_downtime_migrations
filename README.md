@@ -43,7 +43,20 @@ class AddPublishedToPosts < ActiveRecord::Migration[5.0]
 end
 ```
 
-We can also globally disable the exceptions by setting `ENV["SAFETY_ASSURED"]` when running migrations.
+We can also mark an entire migration as safe by using the `safety_assured` helper method.
+
+```ruby
+class AddPublishedToPosts < ActiveRecord::Migration[5.0]
+  safety_assured
+  
+  def change
+    add_column :posts, :published, :boolean
+    Post.where("created_at >= ?", 1.day.ago).update_all(published: true)
+  end
+end
+```
+
+Enforcements can be globally disabled by setting `ENV["SAFETY_ASSURED"]` when running migrations.
 
 ```bash
 SAFETY_ASSURED=1 bundle exec rake db:migrate --trace

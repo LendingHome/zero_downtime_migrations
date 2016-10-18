@@ -2,6 +2,10 @@ module ZeroDowntimeMigrations
   module Migration
     extend DSL
 
+    def self.prepended(mod)
+      mod.singleton_class.prepend(DSL)
+    end
+
     def ddl_disabled?
       !!disable_ddl_transaction
     end
@@ -19,12 +23,13 @@ module ZeroDowntimeMigrations
       Migration.ddl = false
       Migration.index = false
       Migration.migrating = true
-      Migration.safe = reverse_migration? || rollup_migration?
+      Migration.safe ||= reverse_migration? || rollup_migration?
 
       super.tap do
         validate(:ddl_migration)
         validate(:mixed_migration)
         Migration.migrating = false
+        Migration.safe = false
       end
     end
 

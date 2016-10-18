@@ -26,6 +26,10 @@ module ZeroDowntimeMigrations
       !!@safe || ENV["SAFETY_ASSURED"].presence
     end
 
+    def safety_assured
+      Migration.safe = true
+    end
+
     def unsafe?
       !safe?
     end

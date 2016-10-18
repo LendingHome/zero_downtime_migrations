@@ -22,6 +22,7 @@ module ZeroDowntimeMigrations
       Migration.safe = reverse_migration? || rollup_migration?
 
       super.tap do
+        validate(:ddl_migration)
         validate(:mixed_migration)
         Migration.migrating = false
       end

@@ -22,6 +22,7 @@ This gem will automatically raise exceptions when potential database locking mig
 * Adding a column with a default
 * Adding a non-concurrent index
 * Mixing data changes with index or schema migrations
+* Performing data or schema migrations with the DDL transaction disabled
 * Using `each` instead of `find_each` to loop thru `ActiveRecord` objects
 
 These exceptions display clear instructions of how to perform the same operation the "zero downtime way".
@@ -118,32 +119,6 @@ class IndexUsersOnEmail < ActiveRecord::Migration[5.0]
 end
 ```
 
-### Looping thru `ActiveRecord::Base` objects
-
-#### Bad
-
-```ruby
-class BackportPublishedDefaultOnPosts < ActiveRecord::Migration[5.0]
-  def change
-    Post.all.each do |post|
-      post.update_attribute(published: true)
-    end
-  end
-end
-```
-
-#### Good
-
-```ruby
-class BackportPublishedDefaultOnPosts < ActiveRecord::Migration[5.0]
-  def change
-    Post.all.find_each do |post|
-      post.update_attribute(published: true)
-    end
-  end
-end
-```
-
 ### Mixing data/index/schema migrations
 
 #### Bad
@@ -186,13 +161,80 @@ class IndexPublishedOnPosts < ActiveRecord::Migration[5.0]
 end
 ```
 
+### Disabling the DDL transaction
+
+#### Bad
+
+```ruby
+class AddPublishedToPosts < ActiveRecord::Migration[5.0]
+  disable_ddl_transaction!
+
+  def change
+    add_column :posts, :published, :boolean
+  end
+end
+```
+
+```ruby
+class UpdatePublishedOnPosts < ActiveRecord::Migration[5.0]
+  disable_ddl_transaction!
+
+  def change
+    Post.update_all(published: true)
+  end
+end
+```
+
+#### Good
+
+```ruby
+class AddPublishedToPosts < ActiveRecord::Migration[5.0]
+  def change
+    add_column :posts, :published, :boolean
+  end
+end
+```
+
+```ruby
+class UpdatePublishedOnPosts < ActiveRecord::Migration[5.0]
+  def change
+    Post.update_all(published: true)
+  end
+end
+```
+
+### Looping thru `ActiveRecord::Base` objects
+
+#### Bad
+
+```ruby
+class BackportPublishedDefaultOnPosts < ActiveRecord::Migration[5.0]
+  def change
+    Post.all.each do |post|
+      post.update_attribute(published: true)
+    end
+  end
+end
+```
+
+#### Good
+
+```ruby
+class BackportPublishedDefaultOnPosts < ActiveRecord::Migration[5.0]
+  def change
+    Post.all.find_each do |post|
+      post.update_attribute(published: true)
+    end
+  end
+end
+```
+
 ### TODO
 
 * Changing a column type
 * Removing a column
 * Renaming a column
 * Renaming a table
-* Performing schema changes with the DDL transaction disabled
 
 ## Testing
 

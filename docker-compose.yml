@@ -9,6 +9,7 @@ services:
       - postgres
     environment:
       - CI
+      - CODECLIMATE_REPO_TOKEN=efff74f42f6e9dff9daa21e21e8d8d2d3cb33f37b84a9d06bb907edb48a2cf6f
       - DATABASE_URL=postgres://postgres@postgres/zero_downtime_migrations
       - DOCKER=true
       - RACK_ENV=test

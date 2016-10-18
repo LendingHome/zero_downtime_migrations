@@ -13,9 +13,11 @@ ActiveRecord::Migration.send(:prepend, ZeroDowntimeMigrations::Migration)
 ActiveRecord::Relation.send(:prepend, ZeroDowntimeMigrations::Relation)
 
 module ZeroDowntimeMigrations
+  GEMSPEC = name.underscore.concat(".gemspec")
+
   class << self
     def gemspec
-      @gemspec ||= Gem::Specification.load(root.join("zero_downtime_migrations.gemspec").to_s)
+      @gemspec ||= Gem::Specification.load(root.join(GEMSPEC).to_s)
     end
 
     def root

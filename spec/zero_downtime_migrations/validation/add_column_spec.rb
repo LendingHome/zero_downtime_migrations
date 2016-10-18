@@ -1,4 +1,4 @@
-RSpec.describe ZeroDowntimeMigrations::AddColumn do
+RSpec.describe ZeroDowntimeMigrations::Validation::AddColumn do
   let(:error) { ZeroDowntimeMigrations::UnsafeMigrationError }
 
   context "with a default" do

@@ -1,4 +1,4 @@
-RSpec.describe ZeroDowntimeMigrations::MixedMigration do
+RSpec.describe ZeroDowntimeMigrations::Validation::MixedMigration do
   let(:error) { ZeroDowntimeMigrations::UnsafeMigrationError }
 
   context "with a migration that adds a column and index" do

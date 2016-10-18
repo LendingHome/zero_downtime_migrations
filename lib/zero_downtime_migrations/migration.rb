@@ -71,10 +71,6 @@ module ZeroDowntimeMigrations
       super
     end
 
-    def namespace
-      Module.nesting.last
-    end
-
     def reverse_migration?
       @direction == :down
     end
@@ -92,11 +88,7 @@ module ZeroDowntimeMigrations
     end
 
     def validate(type, *args)
-      unless Migration.safe?
-        validator = "#{namespace}::#{type.to_s.classify}".safe_constantize
-        validator ||= namespace::Noop
-        validator.new(self, *args).validate!
-      end
+      Validation.validate!(type, self, *args) if Migration.unsafe?
     end
   end
 end

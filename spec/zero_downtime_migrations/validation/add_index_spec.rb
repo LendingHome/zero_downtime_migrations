@@ -1,4 +1,4 @@
-RSpec.describe ZeroDowntimeMigrations::AddIndex do
+RSpec.describe ZeroDowntimeMigrations::Validation::AddIndex do
   let(:error) { ZeroDowntimeMigrations::UnsafeMigrationError }
 
   context "with ddl transaction enabled" do

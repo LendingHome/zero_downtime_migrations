@@ -5,12 +5,10 @@ require_relative "zero_downtime_migrations/dsl"
 require_relative "zero_downtime_migrations/migration"
 require_relative "zero_downtime_migrations/relation"
 require_relative "zero_downtime_migrations/validation"
+require_relative "zero_downtime_migrations/validation/add_column"
+require_relative "zero_downtime_migrations/validation/add_index"
+require_relative "zero_downtime_migrations/validation/mixed_migration"
 require_relative "zero_downtime_migrations/unsafe_migration_error"
-
-require_relative "zero_downtime_migrations/add_column"
-require_relative "zero_downtime_migrations/add_index"
-require_relative "zero_downtime_migrations/mixed_migration"
-require_relative "zero_downtime_migrations/noop"
 
 ActiveRecord::Base.send(:prepend, ZeroDowntimeMigrations::Data)
 ActiveRecord::Migration.send(:prepend, ZeroDowntimeMigrations::Migration)

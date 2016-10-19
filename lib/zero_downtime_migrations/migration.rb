@@ -11,24 +11,24 @@ module ZeroDowntimeMigrations
     end
 
     def define(*)
-      Migration.migrating = true
+      Migration.current = self
       Migration.safe = true
-      super
+      super.tap { Migration.current = nil }
     end
 
     def migrate(direction)
       @direction = direction
 
+      Migration.current = self
       Migration.data = false
       Migration.ddl = false
       Migration.index = false
-      Migration.migrating = true
       Migration.safe ||= reverse_migration? || rollup_migration?
 
       super.tap do
         validate(:ddl_migration)
         validate(:mixed_migration)
-        Migration.migrating = false
+        Migration.current = nil
         Migration.safe = false
       end
     end
@@ -94,7 +94,7 @@ module ZeroDowntimeMigrations
     end
 
     def validate(type, *args)
-      Validation.validate!(type, self, *args)
+      Validation.validate!(type, *args)
     rescue UndefinedValidationError
       nil
     end

@@ -36,6 +36,8 @@ These exceptions display clear instructions of how to perform the same operation
 
 #### Bad
 
+This migration can potentially lock your database table!
+
 ```ruby
 class AddPublishedToPosts < ActiveRecord::Migration[5.0]
   def change
@@ -46,6 +48,8 @@ end
 
 #### Good
 
+Instead, let's first add the column without a default.
+
 ```ruby
 class AddPublishedToPosts < ActiveRecord::Migration[5.0]
   def change
@@ -54,6 +58,8 @@ class AddPublishedToPosts < ActiveRecord::Migration[5.0]
 end
 ```
 
+Then set the new column default in a separate migration. Note that this does not update any existing data.
+
 ```ruby
 class SetPublishedDefaultOnPosts < ActiveRecord::Migration[5.0]
   def change
@@ -61,6 +67,8 @@ class SetPublishedDefaultOnPosts < ActiveRecord::Migration[5.0]
   end
 end
 ```
+
+If necessary then backport the default value for existing data in batches. This should be done in its own migration as well.
 
 ```ruby
 class BackportPublishedDefaultOnPosts < ActiveRecord::Migration[5.0]
@@ -77,6 +85,8 @@ end
 
 #### Bad
 
+This action can potentially lock your database table while indexing all existing data!
+
 ```ruby
 class IndexUsersOnEmail < ActiveRecord::Migration[5.0]
   def change
@@ -86,6 +96,8 @@ end
 ```
 
 #### Good
+
+Instead, let's add the index concurrently in its own migration with the DDL transaction disabled.
 
 ```ruby
 class IndexUsersOnEmail < ActiveRecord::Migration[5.0]
@@ -101,6 +113,8 @@ end
 
 #### Bad
 
+Performing migrations that change the schema, update data, or add indexes within one big transaction is unsafe!
+
 ```ruby
 class AddPublishedToPosts < ActiveRecord::Migration[5.0]
   def change
@@ -112,6 +126,12 @@ end
 ```
 
 #### Good
+
+Instead, let's split apart these types of migrations into separate files.
+
+* Introduce schema changes with methods like `create_table` or `add_column` in one file.
+* Update data with methods like `update_all` or `save` in another file.
+* Add indexes concurrently within their own file as well.
 
 ```ruby
 class AddPublishedToPosts < ActiveRecord::Migration[5.0]
@@ -143,6 +163,8 @@ end
 
 #### Bad
 
+The DDL transaction should only be disabled for migrations that add indexes.
+
 ```ruby
 class AddPublishedToPosts < ActiveRecord::Migration[5.0]
   disable_ddl_transaction!
@@ -164,6 +186,8 @@ end
 ```
 
 #### Good
+
+Any other data or schema changes must live in their own migration files with the DDL transaction enabled just in case they make changes that need to be rolled back.
 
 ```ruby
 class AddPublishedToPosts < ActiveRecord::Migration[5.0]
@@ -185,6 +209,8 @@ end
 
 #### Bad
 
+This might accidentally load tens or hundreds of thousands of records into memory all at the same time!
+
 ```ruby
 class BackportPublishedDefaultOnPosts < ActiveRecord::Migration[5.0]
   def change
@@ -196,6 +222,8 @@ end
 ```
 
 #### Good
+
+Let's use the `find_each` method to fetch records in batches instead.
 
 ```ruby
 class BackportPublishedDefaultOnPosts < ActiveRecord::Migration[5.0]

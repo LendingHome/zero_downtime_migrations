@@ -2,11 +2,11 @@ module ZeroDowntimeMigrations
   class Validation
     def self.validate!(type, migration = nil, *args)
       return unless Migration.migrating? && Migration.unsafe?
-      validator = type.to_s.classify
 
-      if const_defined?(validator)
+      begin
+        validator = type.to_s.classify
         const_get(validator).new(migration, *args).validate!
-      else
+      rescue NameError
         raise UndefinedValidationError.new(validator)
       end
     end

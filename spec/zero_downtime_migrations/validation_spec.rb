@@ -8,7 +8,7 @@ RSpec.describe ZeroDowntimeMigrations::Validation do
     let(:error) { ZeroDowntimeMigrations::UndefinedValidationError }
 
     it "raises UndefinedValidationError if one does not exist" do
-      expect { described_class.validate!(:invalid) }.to raise_error(error)
+      expect { described_class.validate!(:invalid?) }.to raise_error(error)
     end
   end
 

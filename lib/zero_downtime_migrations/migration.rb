@@ -95,6 +95,8 @@ module ZeroDowntimeMigrations
 
     def validate(type, *args)
       Validation.validate!(type, self, *args)
+    rescue UndefinedValidationError
+      nil
     end
   end
 end

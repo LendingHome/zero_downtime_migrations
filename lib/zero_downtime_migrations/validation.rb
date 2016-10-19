@@ -18,8 +18,8 @@ module ZeroDowntimeMigrations
       @args = args
     end
 
-    def error!(*args)
-      raise UnsafeMigrationError.new(*args)
+    def error!(message)
+      raise UnsafeMigrationError.new(message)
     end
 
     def migration_name

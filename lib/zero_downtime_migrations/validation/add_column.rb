@@ -3,14 +3,15 @@ module ZeroDowntimeMigrations
     class AddColumn < Validation
       def validate!
         return if options[:default].nil? # only nil is safe
-        message = "Adding a column with a default is unsafe!"
-        error!(message, correction)
+        error!(message)
       end
 
       private
 
-      def correction
+      def message
         <<-MESSAGE.strip_heredoc
+          Adding a column with a default is unsafe!
+
           This action can potentially lock your database table!
 
           Instead, let's first add the column without a default.

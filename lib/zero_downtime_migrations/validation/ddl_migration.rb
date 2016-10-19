@@ -3,14 +3,15 @@ module ZeroDowntimeMigrations
     class DdlMigration < Validation
       def validate!
         return unless migration.ddl_disabled? && !Migration.index?
-        message = "Disabling the DDL transaction is unsafe!"
-        error!(message, correction)
+        error!(message)
       end
 
       private
 
-      def correction
+      def message
         <<-MESSAGE.strip_heredoc
+          Disabling the DDL transaction is unsafe!
+
           The DDL transaction should only be disabled for migrations that add indexes.
 
           Any other data or schema changes must live in their own migration files with

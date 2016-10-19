@@ -3,14 +3,15 @@ module ZeroDowntimeMigrations
     class MixedMigration < Validation
       def validate!
         return unless Migration.mixed?
-        message = "Mixing data/index/schema changes in the same migration is unsafe!"
-        error!(message, correction)
+        error!(message)
       end
 
       private
 
-      def correction
+      def message
         <<-MESSAGE.strip_heredoc
+          Mixing data/index/schema changes in the same migration is unsafe!
+
           Instead, let's split apart these types of migrations into separate files.
 
           * Introduce schema changes with methods like `create_table` or `add_column` in one file.

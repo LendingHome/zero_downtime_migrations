@@ -18,12 +18,12 @@ RSpec.describe ZeroDowntimeMigrations::Validation do
     end
   end
 
-  describe "#error" do
-    let(:args) { [:one, :two] }
+  describe "#error!" do
     let(:error) { ZeroDowntimeMigrations::UnsafeMigrationError }
+    let(:message) { "test" }
 
     it "raises a new UnsafeMigrationError" do
-      expect { subject.error!(*args) }.to raise_error(error)
+      expect { subject.error!(message) }.to raise_error(error)
     end
   end
 

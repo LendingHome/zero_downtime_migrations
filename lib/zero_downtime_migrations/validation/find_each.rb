@@ -2,14 +2,15 @@ module ZeroDowntimeMigrations
   class Validation
     class FindEach < Validation
       def validate!
-        message = "Using `ActiveRecord::Relation#each` is unsafe!"
-        error!(message, correction)
+        error!(message)
       end
 
       private
 
-      def correction
+      def message
         <<-MESSAGE.strip_heredoc
+          Using `ActiveRecord::Relation#each` is unsafe!
+
           Let's use the `find_each` method to fetch records in batches instead.
 
           Otherwise we may accidentally load tens or hundreds of thousands of

@@ -3,14 +3,15 @@ module ZeroDowntimeMigrations
     class AddIndex < Validation
       def validate!
         return if concurrent? && migration.ddl_disabled?
-        message = "Adding a non-concurrent index is unsafe!"
-        error!(message, correction)
+        error!(message)
       end
 
       private
 
-      def correction
+      def message
         <<-MESSAGE.strip_heredoc
+          Adding a non-concurrent index is unsafe!
+
           This action can potentially lock your database table!
 
           Instead, let's add the index concurrently in its own migration with

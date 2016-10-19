@@ -19,10 +19,10 @@ module ZeroDowntimeMigrations
           If you're 100% positive that this migration is already safe, then wrap the
           call to `each` in a `safety_assured` block.
 
-            class YourMigration < ActiveRecord::Migration
+            class #{migration_name} < ActiveRecord::Migration
               def change
                 safety_assured do
-                  # use .each in this block
+                  # use ActiveRecord::Relation.each in this block
                 end
               end
             end

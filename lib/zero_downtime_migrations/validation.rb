@@ -19,7 +19,10 @@ module ZeroDowntimeMigrations
     end
 
     def error!(message)
-      raise UnsafeMigrationError.new(message)
+      error = UnsafeMigrationError
+      debug = "#{error}: #{migration_name} is unsafe!"
+      message = [message, debug, nil].join("\n")
+      raise error.new(message)
     end
 
     def migration_name

@@ -1,7 +1,7 @@
 PATH
   remote: .
   specs:
-    zero_downtime_migrations (0.0.1)
+    zero_downtime_migrations (0.0.2)
       activerecord
 
 GEM

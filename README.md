@@ -10,10 +10,10 @@ Catch problematic migrations at development/test time! Heavily inspired by these
 
 ## Installation
 
-Simply add this gem to the project `Gemfile` under the **`development` and `test`** groups.
+Simply add this gem to the project `Gemfile`.
 
 ```ruby
-gem "zero_downtime_migrations", only: %i(development test)
+gem "zero_downtime_migrations"
 ```
 
 ## Usage

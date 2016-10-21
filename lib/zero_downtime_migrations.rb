@@ -3,7 +3,6 @@ require "active_record"
 require_relative "zero_downtime_migrations/data"
 require_relative "zero_downtime_migrations/dsl"
 require_relative "zero_downtime_migrations/error"
-require_relative "zero_downtime_migrations/loader"
 require_relative "zero_downtime_migrations/migration"
 require_relative "zero_downtime_migrations/relation"
 require_relative "zero_downtime_migrations/validation"
@@ -13,7 +12,8 @@ require_relative "zero_downtime_migrations/validation/ddl_migration"
 require_relative "zero_downtime_migrations/validation/find_each"
 require_relative "zero_downtime_migrations/validation/mixed_migration"
 
-ActiveRecord::Migration.send(:prepend, ZeroDowntimeMigrations::Loader)
+ActiveRecord::Migration.send(:prepend, ZeroDowntimeMigrations::Migration)
+ActiveRecord::Schema.send(:prepend, ZeroDowntimeMigrations::Migration)
 
 module ZeroDowntimeMigrations
   GEMSPEC = name.underscore.concat(".gemspec")

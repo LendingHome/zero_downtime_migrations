@@ -6,6 +6,12 @@ module ZeroDowntimeMigrations
       mod.singleton_class.prepend(DSL)
     end
 
+    def initialize(*)
+      ActiveRecord::Base.send(:prepend, Data)
+      ActiveRecord::Relation.send(:prepend, Relation)
+      super
+    end
+
     def ddl_disabled?
       !!disable_ddl_transaction
     end

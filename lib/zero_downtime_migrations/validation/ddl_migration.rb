@@ -13,6 +13,8 @@ module ZeroDowntimeMigrations
           Disabling the DDL transaction is unsafe!
 
           The DDL transaction should only be disabled for migrations that add indexes.
+          All other types of migrations should keep the DDL transaction enabled so
+          that changes can be rolled back if any unexpected errors occur.
 
           Any other data or schema changes must live in their own migration files with
           the DDL transaction enabled just in case they need to be rolled back.

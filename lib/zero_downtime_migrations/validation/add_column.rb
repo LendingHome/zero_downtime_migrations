@@ -12,9 +12,12 @@ module ZeroDowntimeMigrations
         <<-MESSAGE.strip_heredoc
           Adding a column with a default is unsafe!
 
-          This action can potentially lock your database table!
+          This can take a long time with significant database
+          size or traffic and lock your table!
 
-          Instead, let's first add the column without a default.
+          First let’s add the column without a default. When we add
+          a column with a default it has to lock the table while it
+          performs an UPDATE for ALL rows to set this new default.
 
             class Add#{column_title}To#{table_title} < ActiveRecord::Migration
               def change
@@ -22,8 +25,9 @@ module ZeroDowntimeMigrations
               end
             end
 
-          Then set the new column default in a separate migration. Note that
-          this does not update any existing data.
+          Then we’ll set the new column default in a separate migration.
+          Note that this does not update any existing data! This only
+          sets the default for newly inserted rows going forward.
 
             class AddDefault#{column_title}To#{table_title} < ActiveRecord::Migration
               def change
@@ -31,8 +35,10 @@ module ZeroDowntimeMigrations
               end
             end
 
-          If necessary then backport the default value for existing data in batches.
-          This should be done in its own migration as well.
+          Finally we’ll backport the default value for existing data in
+          batches. This should be done in its own migration as well.
+          Updating in batches allows us to lock 1000 rows at a time
+          (or whatever batch size we prefer).
 
             class BackportDefault#{column_title}To#{table_title} < ActiveRecord::Migration
               def change

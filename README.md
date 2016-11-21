@@ -36,7 +36,7 @@ These exceptions display clear instructions of how to perform the same operation
 
 #### Bad
 
-This migration can potentially lock your database table!
+This can take a long time with significant database size or traffic and lock your table!
 
 ```ruby
 class AddPublishedToPosts < ActiveRecord::Migration[5.0]
@@ -48,7 +48,7 @@ end
 
 #### Good
 
-Instead, let's first add the column without a default.
+First let’s add the column without a default. When we add a column with a default it has to lock the table while it performs an UPDATE for ALL rows to set this new default.
 
 ```ruby
 class AddPublishedToPosts < ActiveRecord::Migration[5.0]
@@ -58,7 +58,7 @@ class AddPublishedToPosts < ActiveRecord::Migration[5.0]
 end
 ```
 
-Then set the new column default in a separate migration. Note that this does not update any existing data.
+Then we’ll set the new column default in a separate migration. Note that this does not update any existing data! This only sets the default for newly inserted rows going forward.
 
 ```ruby
 class SetPublishedDefaultOnPosts < ActiveRecord::Migration[5.0]
@@ -68,7 +68,7 @@ class SetPublishedDefaultOnPosts < ActiveRecord::Migration[5.0]
 end
 ```
 
-If necessary then backport the default value for existing data in batches. This should be done in its own migration as well.
+Finally we’ll backport the default value for existing data in batches. This should be done in its own migration as well. Updating in batches allows us to lock 1000 rows at a time (or whatever batch size we prefer).
 
 ```ruby
 class BackportPublishedDefaultOnPosts < ActiveRecord::Migration[5.0]
@@ -85,7 +85,7 @@ end
 
 #### Bad
 
-This action can potentially lock your database table while indexing all existing data!
+This action can lock your database table while indexing existing data!
 
 ```ruby
 class IndexUsersOnEmail < ActiveRecord::Migration[5.0]
@@ -98,6 +98,8 @@ end
 #### Good
 
 Instead, let's add the index concurrently in its own migration with the DDL transaction disabled.
+
+This allows PostgreSQL to build the index without locking in a way that prevent concurrent inserts, updates, or deletes on the table. Standard indexes lock out writes (but not reads) on the table.
 
 ```ruby
 class IndexUsersOnEmail < ActiveRecord::Migration[5.0]
@@ -129,9 +131,9 @@ end
 
 Instead, let's split apart these types of migrations into separate files.
 
-* Introduce schema changes with methods like `create_table` or `add_column` in one file.
-* Update data with methods like `update_all` or `save` in another file.
-* Add indexes concurrently within their own file as well.
+* Introduce schema changes with methods like `create_table` or `add_column` in one file. These should be run within a DDL transaction so that they can be rolled back if there are any issues.
+* Update data with methods like `update_all` or `save` in another file. Data migrations tend to be much more error prone than changing the schema or adding indexes.
+* Add indexes concurrently within their own file as well. Indexes should be created without the DDL transaction enabled to avoid table locking.
 
 ```ruby
 class AddPublishedToPosts < ActiveRecord::Migration[5.0]
@@ -163,7 +165,7 @@ end
 
 #### Bad
 
-The DDL transaction should only be disabled for migrations that add indexes.
+The DDL transaction should only be disabled for migrations that add indexes. All other types of migrations should keep the DDL transaction enabled so that changes can be rolled back if any unexpected errors occur.
 
 ```ruby
 class AddPublishedToPosts < ActiveRecord::Migration[5.0]

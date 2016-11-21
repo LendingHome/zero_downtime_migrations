@@ -12,10 +12,14 @@ module ZeroDowntimeMigrations
         <<-MESSAGE.strip_heredoc
           Adding a non-concurrent index is unsafe!
 
-          This action can potentially lock your database table!
+          This action can lock your database table while indexing existing data!
 
           Instead, let's add the index concurrently in its own migration with
           the DDL transaction disabled.
+
+          This allows PostgreSQL to build the index without locking in a way
+          that prevent concurrent inserts, updates, or deletes on the table.
+          Standard indexes lock out writes (but not reads) on the table.
 
             class Index#{table_title}On#{column_title} < ActiveRecord::Migration
               disable_ddl_transaction!

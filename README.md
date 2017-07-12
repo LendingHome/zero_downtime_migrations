@@ -73,9 +73,11 @@ Finally we’ll backport the default value for existing data in batches. This sh
 ```ruby
 class BackportPublishedDefaultOnPosts < ActiveRecord::Migration[5.0]
   def change
-    Post.select(:id).find_in_batches.with_index do |batch, index|
+    # use .with_deleted if you need to backfill rows that have already been deleted
+    Post.with_deleted.select(:id).find_in_batches.with_index do |batch, index|
       puts "Processing batch #{index}\r"
-      Post.where(id: batch).update_all(published: true)
+      # you've got to call .with_deleted here as well if you call it in the find_in_batches dataset
+      Post.with_deleted.where(id: batch).update_all(published: true)
     end
   end
 end
@@ -146,7 +148,8 @@ end
 ```ruby
 class BackportPublishedOnPosts < ActiveRecord::Migration[5.0]
   def change
-    Post.update_all(published: true)
+    # remember you might need to update deleted rows as well
+    Post.with_deleted.update_all(published: true)
   end
 end
 ```
@@ -182,7 +185,8 @@ class UpdatePublishedOnPosts < ActiveRecord::Migration[5.0]
   disable_ddl_transaction!
 
   def change
-    Post.update_all(published: true)
+    # remember to use .with_deleted if you need to update deleted rows
+    Post.with_deleted.update_all(published: true)
   end
 end
 ```
@@ -202,7 +206,8 @@ end
 ```ruby
 class UpdatePublishedOnPosts < ActiveRecord::Migration[5.0]
   def change
-    Post.update_all(published: true)
+    # you might need to update deleted rows as well
+    Post.with_deleted.update_all(published: true)
   end
 end
 ```
@@ -230,7 +235,8 @@ Let's use the `find_each` method to fetch records in batches instead.
 ```ruby
 class BackportPublishedDefaultOnPosts < ActiveRecord::Migration[5.0]
   def change
-    Post.all.find_each do |post|
+    # you might need to select deleted records as well
+    Post.with_deleted.all.find_each do |post|
       post.update_attribute(published: true)
     end
   end
@@ -302,7 +308,7 @@ class AddPublishedToPosts < ActiveRecord::Migration[5.0]
 
   def change
     add_column :posts, :published, :boolean
-    Post.where("created_at >= ?", 1.day.ago).update_all(published: true)
+    Post.with_deleted.where("created_at >= ?", 1.day.ago).update_all(published: true)
   end
 end
 ```

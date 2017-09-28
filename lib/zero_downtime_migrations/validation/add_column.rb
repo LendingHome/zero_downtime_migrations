@@ -2,13 +2,13 @@ module ZeroDowntimeMigrations
   class Validation
     class AddColumn < Validation
       def validate!
-        return if options[:default].nil? # only nil is safe
-        error!(message)
+        error!(default_message) unless options[:default].nil?
+        error!(disable_ddl_message) unless migration.ddl_disabled?
       end
 
       private
 
-      def message
+      def default_message
         <<-MESSAGE.strip_heredoc
           Adding a column with a default is unsafe!
 
@@ -54,6 +54,33 @@ module ZeroDowntimeMigrations
             class #{table_model} < ActiveRecord::Base
               def #{column}
                 self["#{column}"] ||= #{column_default}
+              end
+            end
+
+          If you're 100% positive that this migration is already safe, then wrap the
+          call to `add_column` in a `safety_assured` block.
+
+            class Add#{column_title}To#{table_title} < ActiveRecord::Migration
+              def change
+                safety_assured { add_column :#{table}, :#{column}, :#{column_type}, default: #{column_default} }
+              end
+            end
+        MESSAGE
+      end
+      
+      def disable_ddl_message
+        <<-MESSAGE.strip_heredoc
+          Adding a column on a large table is unsafe!
+
+          This can take a long time with significant database
+          size or traffic and lock your table! Disable ddl transactions to
+          prevent locking the table while the new column is being added.
+
+            class Add#{column_title}To#{table_title} < ActiveRecord::Migration
+              disable_ddl_transaction!
+              
+              def change
+                add_column :#{table}, :#{column}, :#{column_type}
               end
             end
 

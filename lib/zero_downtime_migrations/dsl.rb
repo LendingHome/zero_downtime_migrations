@@ -1,6 +1,6 @@
 module ZeroDowntimeMigrations
   module DSL
-    attr_accessor :current, :data, :ddl, :index, :safe
+    attr_accessor :current, :data, :ddl, :index, :safe, :column
 
     def data?
       !!@data
@@ -12,6 +12,10 @@ module ZeroDowntimeMigrations
 
     def index?
       !!@index
+    end
+    
+    def column?
+      !!@column
     end
 
     def migrating?

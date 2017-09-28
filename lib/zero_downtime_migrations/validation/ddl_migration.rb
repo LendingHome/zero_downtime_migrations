@@ -2,7 +2,7 @@ module ZeroDowntimeMigrations
   class Validation
     class DdlMigration < Validation
       def validate!
-        return unless migration.ddl_disabled? && !Migration.index?
+        return unless migration.ddl_disabled? && !(Migration.index? || Migration.column?)
         error!(message)
       end
 
@@ -12,7 +12,7 @@ module ZeroDowntimeMigrations
         <<-MESSAGE.strip_heredoc
           Disabling the DDL transaction is unsafe!
 
-          The DDL transaction should only be disabled for migrations that add indexes.
+          The DDL transaction should only be disabled for migrations that add indexes or columns.
           All other types of migrations should keep the DDL transaction enabled so
           that changes can be rolled back if any unexpected errors occur.
 

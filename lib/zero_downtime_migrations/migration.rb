@@ -29,6 +29,7 @@ module ZeroDowntimeMigrations
       Migration.data = false
       Migration.ddl = false
       Migration.index = false
+      Migration.column = false
       Migration.safe ||= reverse_migration? || rollup_migration?
 
       super.tap do
@@ -75,10 +76,15 @@ module ZeroDowntimeMigrations
     def index_method?(method)
       %i(add_index).include?(method)
     end
+    
+    def column_method?(method)
+      %i(add_column rename_column).include?(method)
+    end
 
     def method_missing(method, *args)
       Migration.ddl = true if ddl_method?(method)
       Migration.index = true if index_method?(method)
+      Migration.column = true if column_method?(method)
       validate(method, *args)
       super
     end

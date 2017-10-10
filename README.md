@@ -261,13 +261,20 @@ end
 class AddPublishedToPosts < ActiveRecord::Migration[5.0]
   def change
     add_column :posts, :published_DEPRECATED, :boolean  #published is original column
-    Post.update_all("\"published_DEPRECATED\"=published") #need to quote capitals in postgres
   end
 end
 ```
 
 ```ruby
 class CopyPublishedDataOnPosts < ActiveRecord::Migration[5.0]
+  def change
+    Post.update_all("\"published_DEPRECATED\"=published") #need to quote capitals in postgres
+  end
+end
+```
+
+```ruby
+class DropPublishedFromPosts < ActiveRecord::Migration[5.0]
   def change
     remove_column :posts, :published
   end

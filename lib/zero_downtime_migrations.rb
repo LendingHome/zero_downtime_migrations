@@ -9,6 +9,7 @@ require_relative "zero_downtime_migrations/validation"
 require_relative "zero_downtime_migrations/validation/add_column"
 require_relative "zero_downtime_migrations/validation/add_index"
 require_relative "zero_downtime_migrations/validation/ddl_migration"
+require_relative "zero_downtime_migrations/validation/drop_table"
 require_relative "zero_downtime_migrations/validation/find_each"
 require_relative "zero_downtime_migrations/validation/mixed_migration"
 

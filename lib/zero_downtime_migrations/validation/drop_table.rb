@@ -12,9 +12,9 @@ module ZeroDowntimeMigrations
           Dropping tables is unsafe!
 
           This action can cause outages in production if old code is still referencing
-          the model.
+          the associated model.
 
-          Instead, remove the code and add this migration in a seperate PR.
+          Instead, remove the dependant code first and add this migration in a seperate PR.
 
           If you're 100% positive that this migration is already safe, then wrap the
           call to `drop_table` in a `safety_assured` block.

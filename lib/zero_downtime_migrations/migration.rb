@@ -29,7 +29,7 @@ module ZeroDowntimeMigrations
       Migration.data = false
       Migration.ddl = false
       Migration.index = false
-      Migration.safe ||= reverse_migration? || rollup_migration?
+      Migration.safe ||= old_migration? || reverse_migration? || rollup_migration?
 
       super.tap do
         validate(:ddl_migration)
@@ -81,6 +81,10 @@ module ZeroDowntimeMigrations
       Migration.index = true if index_method?(method)
       validate(method, *args)
       super
+    end
+
+    def old_migration?
+      version && version <= ENV["ZERO_DOWNTIME_MIGRATIONS_LAST_UNSAFE_VERSION"].to_i
     end
 
     def reverse_migration?

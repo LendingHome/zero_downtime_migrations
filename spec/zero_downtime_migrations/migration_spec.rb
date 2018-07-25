@@ -17,11 +17,9 @@ RSpec.describe ZeroDowntimeMigrations::Migration do
 
     context "with ZERO_DOWNTIME_MIGRATIONS_LAST_UNSAFE_VERSION set" do
       around(:each) do |example|
-        ENV['ZERO_DOWNTIME_MIGRATIONS_LAST_UNSAFE_VERSION'] = '20130101000000'
-
+        ENV["ZERO_DOWNTIME_MIGRATIONS_LAST_UNSAFE_VERSION"] = "20130101000000"
         example.run
-
-        ENV.delete('ZERO_DOWNTIME_MIGRATIONS_LAST_UNSAFE_VERSION')
+        ENV.delete("ZERO_DOWNTIME_MIGRATIONS_LAST_UNSAFE_VERSION")
       end
 
       it "raises an unsafe migration error when version > ZERO_DOWNTIME_MIGRATIONS_LAST_UNSAFE_VERSION" do

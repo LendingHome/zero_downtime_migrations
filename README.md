@@ -73,9 +73,11 @@ Finally we’ll backport the default value for existing data in batches. This sh
 ```ruby
 class BackportPublishedDefaultOnPosts < ActiveRecord::Migration[5.0]
   def change
-    Post.select(:id).find_in_batches.with_index do |batch, index|
-      puts "Processing batch #{index}\r"
-      Post.where(id: batch).update_all(published: true)
+    say_with_time "Backport posts.published default" do
+      Post.unscoped.select(:id).find_in_batches.with_index do |batch, index|
+        say("Processing batch #{index}\r", true)
+        Post.unscoped.where(id: batch).update_all(published: true)
+      end
     end
   end
 end

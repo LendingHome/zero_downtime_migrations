@@ -239,47 +239,11 @@ class BackportPublishedDefaultOnPosts < ActiveRecord::Migration[5.0]
 end
 ```
 
-### Renaming a column
-
-#### Bad
-```ruby
-class AddPublishedToPosts < ActiveRecord::Migration[5.0]
-  def change
-    rename_column :posts, :published, :published_new_name
-  end
-end
-```
-
-#### Good
-* Introduce schema changes with methods like `create_table` or `add_column`
-* Copy data with methods like `update_all`
-* Introduce code to write to both columns
-* Deploy
-* Add code to stop writing to original column
-* Deploy
-* Drop the column in last separate deploy
-
-```ruby
-class AddPublishedToPosts < ActiveRecord::Migration[5.0]
-  def change
-    add_column :posts, :published_DEPRECATED, :boolean  # published is the original column
-    Post.unscoped.update_all("\"published_DEPRECATED\"=published") # capitals must be quoted
-  end
-end
-```
-
-```ruby
-class CopyPublishedDataOnPosts < ActiveRecord::Migration[5.0]
-  def change
-    remove_column :posts, :published
-  end
-end
-```
-
 ### TODO
 
 * Changing a column type
 * Removing a column
+* Renaming a column
 * Renaming a table
 
 ## Disabling "zero downtime migration" enforcements

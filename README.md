@@ -147,7 +147,7 @@ end
 
 ```ruby
 class BackportPublishedOnPosts < ActiveRecord::Migration[5.0]
-  def change
+  def up
     Post.unscoped.update_all(published: true)
   end
 end
@@ -183,7 +183,7 @@ end
 class UpdatePublishedOnPosts < ActiveRecord::Migration[5.0]
   disable_ddl_transaction!
 
-  def change
+  def up
     Post.unscoped.update_all(published: true)
   end
 end
@@ -203,7 +203,7 @@ end
 
 ```ruby
 class UpdatePublishedOnPosts < ActiveRecord::Migration[5.0]
-  def change
+  def up
     Post.unscoped.update_all(published: true)
   end
 end
@@ -217,7 +217,7 @@ This might accidentally load tens or hundreds of thousands of records into memor
 
 ```ruby
 class BackportPublishedDefaultOnPosts < ActiveRecord::Migration[5.0]
-  def change
+  def up
     Post.unscoped.each do |post|
       post.update_attribute(published: true)
     end
@@ -231,7 +231,7 @@ Let's use the `find_each` method to fetch records in batches instead.
 
 ```ruby
 class BackportPublishedDefaultOnPosts < ActiveRecord::Migration[5.0]
-  def change
+  def up
     Post.unscoped.find_each do |post|
       post.update_attribute(published: true)
     end

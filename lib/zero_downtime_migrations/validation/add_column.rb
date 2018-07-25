@@ -41,7 +41,7 @@ module ZeroDowntimeMigrations
           (or whatever batch size we prefer).
 
             class BackportDefault#{column_title}To#{table_title} < ActiveRecord::Migration
-              def change
+              def up
                 say_with_time "Backport #{table_model}.#{column} default" do
                   #{table_model}.unscoped.select(:id).find_in_batches.with_index do |records, index|
                     say("Processing batch \#{index + 1}\\r", true)

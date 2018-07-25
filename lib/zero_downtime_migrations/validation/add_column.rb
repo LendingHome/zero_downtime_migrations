@@ -42,9 +42,11 @@ module ZeroDowntimeMigrations
 
             class BackportDefault#{column_title}To#{table_title} < ActiveRecord::Migration
               def change
-                #{table_model}.unscoped.select(:id).find_in_batches.with_index do |records, index|
-                  puts "Processing batch \#{index + 1}\\r"
-                  #{table_model}.unscoped.where(id: records).update_all(#{column}: #{column_default})
+                say_with_time "Backport #{table_model}.#{column} default" do
+                  #{table_model}.unscoped.select(:id).find_in_batches.with_index do |records, index|
+                    say("Processing batch \#{index + 1}\\r", true)
+                    #{table_model}.unscoped.where(id: records).update_all(#{column}: #{column_default})
+                  end
                 end
               end
             end

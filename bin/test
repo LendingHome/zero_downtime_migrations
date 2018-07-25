@@ -65,4 +65,5 @@ if [[ -z "$REBUILD_CACHE" ]]; then
   echo "+++ :rspec: Running rspec tests"
   echo "rspec $(bundle exec rspec --version)"
   bundle exec rspec $@
+  bundle exec codeclimate-test-reporter
 fi

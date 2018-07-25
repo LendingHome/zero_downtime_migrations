@@ -6,4 +6,3 @@ steps:
   - name: ":rspec:"
     command: bin/test
     timeout_in_minutes: 30
-    artifact_paths: cache.tar.lz4

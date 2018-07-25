@@ -1,29 +1,7 @@
 #!/bin/bash
 
-set -eo pipefail
+set -euo pipefail
 
-echo -e "--- \033[33mWhat does this command do?\033[0m"
-echo
-echo "  This script runs our LendingHome platform wide rubocop Docker image"
-echo "  for the gem or service mounted at /app. It uses a configuration file"
-echo "  that has been added directly into the rubocop Docker image itself. This"
-echo "  configuration lives in the lendinghome-dockerfiles repository."
-echo
-echo "  Check out the documentation on rubocop for more information!"
-echo
-echo "    * https://github.com/bbatsov/rubocop"
-echo "    * https://github.com/bbatsov/ruby-style-guide"
-echo
-
-if [ -v REBUILD_CACHE ]; then
-  echo "--- :docker: Pulling latest docker image"
-  docker-compose pull rubocop
-
-  echo "--- :recycle: Updating build cache"
-  echo "The build was triggered with REBUILD_CACHE"
-  echo "Skipping the remaining build steps"
-else
-  echo "--- :docker: Starting docker"
-  docker-compose pull rubocop
-  docker-compose run rubocop $@
-fi
+echo "--- :docker: Starting docker"
+docker-compose pull rubocop
+docker-compose run rubocop $@

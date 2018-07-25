@@ -1,4 +1,4 @@
-# ![LendingHome](https://cloud.githubusercontent.com/assets/2419/19467866/7efa93a8-94c8-11e6-93e7-4375dbb8a7bc.png) zero_downtime_migrations
+# ![LendingHome](https://avatars0.githubusercontent.com/u/5448482?s=24&v=4) zero_downtime_migrations
 [![Code Climate](https://codeclimate.com/github/LendingHome/zero_downtime_migrations/badges/gpa.svg)](https://codeclimate.com/github/LendingHome/zero_downtime_migrations) [![Coverage](https://codeclimate.com/github/LendingHome/zero_downtime_migrations/badges/coverage.svg)](https://codeclimate.com/github/LendingHome/zero_downtime_migrations) [![Gem Version](https://badge.fury.io/rb/zero_downtime_migrations.svg)](http://badge.fury.io/rb/zero_downtime_migrations)
 
 > Zero downtime migrations with ActiveRecord and PostgreSQL.
@@ -73,9 +73,11 @@ Finally we’ll backport the default value for existing data in batches. This sh
 ```ruby
 class BackportPublishedDefaultOnPosts < ActiveRecord::Migration[5.0]
   def change
-    Post.select(:id).find_in_batches.with_index do |batch, index|
-      puts "Processing batch #{index}\r"
-      Post.where(id: batch).update_all(published: true)
+    say_with_time "Backport posts.published default" do
+      Post.unscoped.select(:id).find_in_batches.with_index do |batch, index|
+        say("Processing batch #{index}\r", true)
+        Post.unscoped.where(id: batch).update_all(published: true)
+      end
     end
   end
 end
@@ -121,7 +123,7 @@ Performing migrations that change the schema, update data, or add indexes within
 class AddPublishedToPosts < ActiveRecord::Migration[5.0]
   def change
     add_column :posts, :published, :boolean
-    Post.update_all(published: true)
+    Post.unscoped.update_all(published: true)
     add_index :posts, :published
   end
 end
@@ -146,7 +148,7 @@ end
 ```ruby
 class BackportPublishedOnPosts < ActiveRecord::Migration[5.0]
   def change
-    Post.update_all(published: true)
+    Post.unscoped.update_all(published: true)
   end
 end
 ```
@@ -182,7 +184,7 @@ class UpdatePublishedOnPosts < ActiveRecord::Migration[5.0]
   disable_ddl_transaction!
 
   def change
-    Post.update_all(published: true)
+    Post.unscoped.update_all(published: true)
   end
 end
 ```
@@ -202,7 +204,7 @@ end
 ```ruby
 class UpdatePublishedOnPosts < ActiveRecord::Migration[5.0]
   def change
-    Post.update_all(published: true)
+    Post.unscoped.update_all(published: true)
   end
 end
 ```
@@ -216,7 +218,7 @@ This might accidentally load tens or hundreds of thousands of records into memor
 ```ruby
 class BackportPublishedDefaultOnPosts < ActiveRecord::Migration[5.0]
   def change
-    Post.all.each do |post|
+    Post.unscoped.each do |post|
       post.update_attribute(published: true)
     end
   end
@@ -230,7 +232,7 @@ Let's use the `find_each` method to fetch records in batches instead.
 ```ruby
 class BackportPublishedDefaultOnPosts < ActiveRecord::Migration[5.0]
   def change
-    Post.all.find_each do |post|
+    Post.unscoped.find_each do |post|
       post.update_attribute(published: true)
     end
   end
@@ -260,8 +262,8 @@ end
 ```ruby
 class AddPublishedToPosts < ActiveRecord::Migration[5.0]
   def change
-    add_column :posts, :published_DEPRECATED, :boolean  #published is original column
-    Post.update_all("\"published_DEPRECATED\"=published") #need to quote capitals in postgres
+    add_column :posts, :published_DEPRECATED, :boolean  # published is the original column
+    Post.unscoped.update_all("\"published_DEPRECATED\"=published") # capitals must be quoted
   end
 end
 ```
@@ -302,7 +304,7 @@ class AddPublishedToPosts < ActiveRecord::Migration[5.0]
 
   def change
     add_column :posts, :published, :boolean
-    Post.where("created_at >= ?", 1.day.ago).update_all(published: true)
+    Post.unscoped.where("created_at >= ?", 1.day.ago).update_all(published: true)
   end
 end
 ```

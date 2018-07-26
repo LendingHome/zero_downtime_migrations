@@ -31,7 +31,7 @@ module ZeroDowntimeMigrations
 
             class AddDefault#{column_title}To#{table_title} < ActiveRecord::Migration
               def change
-                change_column_default :#{table}, :#{column}, #{column_default}
+                change_column_default :#{table}, :#{column}, from: nil, to: #{column_default}
               end
             end
 

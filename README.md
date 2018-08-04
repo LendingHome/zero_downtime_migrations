@@ -63,7 +63,7 @@ Then we’ll set the new column default in a separate migration. Note that this 
 ```ruby
 class SetPublishedDefaultOnPosts < ActiveRecord::Migration
   def change
-    change_column_default :posts, :published, true
+    change_column_default :posts, :published, from: nil, to: true
   end
 end
 ```

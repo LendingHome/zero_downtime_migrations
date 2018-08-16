@@ -27,6 +27,7 @@ It checks for common things like:
 * Mixing data changes with index or schema migrations
 * Performing data or schema migrations with the DDL transaction disabled
 * Using `each` instead of `find_each` to loop thru `ActiveRecord` objects
+* Check slow database, when change column options null is false with default value 
 
 These exceptions display clear instructions of how to perform the same operation the "zero downtime way".
 

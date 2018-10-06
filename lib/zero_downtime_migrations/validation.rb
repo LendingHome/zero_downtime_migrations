@@ -33,6 +33,18 @@ module ZeroDowntimeMigrations
       args.last.is_a?(Hash) ? args.last : {}
     end
 
+    def type
+      args.last.is_a?(Hash) ? args[-2] : args[-1]
+    end
+
+    def valid_type?
+      # list of valid (database-agnostic) migration types:
+      # https://api.rubyonrails.org/classes/ActiveRecord/ConnectionAdapters/SchemaStatements.html#method-i-add_column
+      #
+      valid_types = %i(primary_key string text integer bigint float decimal numeric datetime time date binary boolean)
+      valid_types.include?(type)
+    end
+
     def validate!
       raise NotImplementedError
     end

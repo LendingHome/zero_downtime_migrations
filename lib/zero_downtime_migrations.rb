@@ -11,6 +11,7 @@ require_relative "zero_downtime_migrations/validation/add_index"
 require_relative "zero_downtime_migrations/validation/ddl_migration"
 require_relative "zero_downtime_migrations/validation/find_each"
 require_relative "zero_downtime_migrations/validation/mixed_migration"
+require_relative "zero_downtime_migrations/validation/rename_column"
 
 ActiveRecord::Migration.send(:prepend, ZeroDowntimeMigrations::Migration)
 ActiveRecord::Schema.send(:prepend, ZeroDowntimeMigrations::Migration)

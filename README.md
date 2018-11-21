@@ -245,7 +245,7 @@ end
 
 Renaming columns is unsafe!
 
-This action can will make existing running code brake which depend on the column.
+This action can make existing running code break which depend on the column.
 
 ```ruby
 class BackportPublishedDefaultOnPosts < ActiveRecord::Migration

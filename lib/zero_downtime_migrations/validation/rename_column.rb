@@ -11,7 +11,7 @@ module ZeroDowntimeMigrations
         <<-MESSAGE.strip_heredoc
           Renaming columns is unsafe!
 
-          This action can will make existing running code brake which depend on the column.
+          This action can make existing running code break which depend on the column.
 
           Instead, let's add a new column and add a callback to keep the new_name_for_column updated:
 

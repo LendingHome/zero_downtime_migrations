@@ -1,10 +1,10 @@
 module ZeroDowntimeMigrations
   class Validation
-    def self.validate!(type, *args)
+    def self.validate!(method, *args)
       return unless Migration.migrating? && Migration.unsafe?
 
       begin
-        validator = type.to_s.classify
+        validator = method.to_s.classify
         const_get(validator).new(Migration.current, *args).validate!
       rescue NameError
         raise UndefinedValidationError.new(validator)
@@ -31,6 +31,18 @@ module ZeroDowntimeMigrations
 
     def options
       args.last.is_a?(Hash) ? args.last : {}
+    end
+
+    def type
+      args.last.is_a?(Hash) ? args[-2] : args[-1]
+    end
+
+    def valid_type?
+      # list of valid (database-agnostic) migration types:
+      # https://api.rubyonrails.org/classes/ActiveRecord/ConnectionAdapters/SchemaStatements.html#method-i-add_column
+      #
+      valid_types = %i(primary_key string text integer bigint float decimal numeric datetime time date binary boolean)
+      valid_types.include?(type)
     end
 
     def validate!

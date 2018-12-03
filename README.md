@@ -83,6 +83,34 @@ class BackportPublishedDefaultOnPosts < ActiveRecord::Migration
 end
 ```
 
+### Removing a column without specifying the column type
+
+#### Bad
+
+Attempting to rollback this migration will cause Rails to raise an error.
+
+```ruby
+class RemovePublishedFromPosts < ActiveRecord::Migration
+  def change
+    remove_column :posts, :published
+  end
+end
+```
+
+#### Good
+
+Instead, let's include the column's type as the third argument of the `remove_column` method.
+
+This allows Rails to rollback the migration without errors.
+
+```ruby
+class RemovePublishedFromPosts < ActiveRecord::Migration
+  def change
+    remove_column :posts, :published, :boolean
+  end
+end
+```
+
 ### Adding an index concurrently
 
 #### Bad

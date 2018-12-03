@@ -103,8 +103,8 @@ module ZeroDowntimeMigrations
       Migration.safe = safe
     end
 
-    def validate(type, *args)
-      Validation.validate!(type, *args)
+    def validate(method, *args)
+      Validation.validate!(method, *args)
     rescue UndefinedValidationError
       nil
     end

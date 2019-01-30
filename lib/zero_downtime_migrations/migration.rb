@@ -73,7 +73,7 @@ module ZeroDowntimeMigrations
     end
 
     def index_method?(method)
-      %i(add_index).include?(method)
+      %i(add_index add_reference).include?(method)
     end
 
     def method_missing(method, *args)

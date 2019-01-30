@@ -75,4 +75,33 @@ RSpec.describe ZeroDowntimeMigrations::Validation::MixedMigration do
       expect { migration.migrate(:up) }.to raise_error(error)
     end
   end
+
+  context "with a migration that adds a reference with index" do
+    let(:migration) do
+      Class.new(ActiveRecord::Migration[5.0]) do
+        def change
+          add_reference :posts, :comment, null: false, index: true
+        end
+      end
+    end
+
+    it "raises an unsafe migration error" do
+      expect { migration.migrate(:up) }.to raise_error(error)
+    end
+  end
+
+  context "with a migration that adds a reference without index" do
+    let(:migration) do
+      Class.new(ActiveRecord::Migration[5.0]) do
+        def change
+          safety_assured
+          add_reference :posts, :comment, index: false
+        end
+      end
+    end
+
+    it "passes" do
+      expect { migration.migrate(:up) }.to_not raise_error(error)
+    end
+  end
 end

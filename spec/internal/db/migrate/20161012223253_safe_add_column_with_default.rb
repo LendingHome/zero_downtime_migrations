@@ -1,5 +1,5 @@
 class SafeAddColumnWithDefault < ActiveRecord::Migration[5.0]
   def change
-    safety_assured { add_column :posts, :published, :boolean, default: false }
+    disable_safety_checks! { add_column :posts, :published, :boolean, default: false }
   end
 end

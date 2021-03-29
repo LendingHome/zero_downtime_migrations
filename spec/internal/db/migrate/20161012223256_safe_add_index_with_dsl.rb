@@ -1,5 +1,5 @@
 class SafeAddIndexWithDsl < ActiveRecord::Migration[5.0]
-  safety_assured
+  disable_safety_checks!
 
   def change
     add_index :posts, :created_at

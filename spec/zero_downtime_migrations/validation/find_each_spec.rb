@@ -15,11 +15,11 @@ RSpec.describe ZeroDowntimeMigrations::Validation::FindEach do
     end
   end
 
-  context "with data migrations using each within safety_assured" do
+  context "with data migrations using each within disable_safety_checks!" do
     let(:migration) do
       Class.new(ActiveRecord::Migration[5.0]) do
         def change
-          safety_assured do
+          disable_safety_checks! do
             User.all.each
           end
         end

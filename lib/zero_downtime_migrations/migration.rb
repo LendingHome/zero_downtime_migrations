@@ -95,7 +95,7 @@ module ZeroDowntimeMigrations
       self.class.name == "RollupMigrations"
     end
 
-    def safety_assured
+    def disable_safety_checks!
       safe = Migration.safe
       Migration.safe = true
       yield

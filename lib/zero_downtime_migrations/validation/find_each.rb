@@ -17,11 +17,11 @@ module ZeroDowntimeMigrations
           records into memory all at the same time!
 
           If you're 100% positive that this migration is already safe, then wrap the
-          call to `each` in a `safety_assured` block.
+          call to `each` in a `disable_safety_checks!` block.
 
             class #{migration_name} < ActiveRecord::Migration
               def up
-                safety_assured do
+                disable_safety_checks! do
                   # use ActiveRecord::Relation.each in this block
                 end
               end

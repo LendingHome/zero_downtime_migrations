@@ -26,10 +26,10 @@ module ZeroDowntimeMigrations
             be created without the DDL transaction enabled to avoid table locking.
 
           If you're 100% positive that this migration is already safe, then simply
-          add a call to `safety_assured` to your migration.
+          add a call to `disable_safety_checks!` to your migration.
 
             class #{migration_name} < ActiveRecord::Migration
-              safety_assured
+              disable_safety_checks!
 
               def change
                 # ...

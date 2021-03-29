@@ -20,11 +20,11 @@ module ZeroDowntimeMigrations
           the DDL transaction enabled just in case they need to be rolled back.
 
           If you're 100% positive that this migration is already safe, then simply
-          add a call to `safety_assured` to your migration.
+          add a call to `disable_safety_checks!` to your migration.
 
             class #{migration_name} < ActiveRecord::Migration
               disable_ddl_transaction!
-              safety_assured
+              disable_safety_checks!
 
               def change
                 # ...

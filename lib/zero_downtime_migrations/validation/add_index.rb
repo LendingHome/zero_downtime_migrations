@@ -30,11 +30,11 @@ module ZeroDowntimeMigrations
             end
 
           If you're 100% positive that this migration is already safe, then wrap the
-          call to `add_index` in a `safety_assured` block.
+          call to `add_index` in a `disable_safety_checks!` block.
 
             class Index#{table_title}On#{column_title} < ActiveRecord::Migration
               def change
-                safety_assured { add_index :#{table}, #{column.inspect} }
+                disable_safety_checks! { add_index :#{table}, #{column.inspect} }
               end
             end
         MESSAGE

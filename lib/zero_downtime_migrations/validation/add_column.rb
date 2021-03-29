@@ -60,11 +60,11 @@ module ZeroDowntimeMigrations
             end
 
           If you're 100% positive that this migration is already safe, then wrap the
-          call to `add_column` in a `safety_assured` block.
+          call to `add_column` in a `disable_safety_checks!` block.
 
             class Add#{column_title}To#{table_title} < ActiveRecord::Migration
               def change
-                safety_assured { add_column :#{table}, :#{column}, :#{column_type}, default: #{column_default} }
+                disable_safety_checks! { add_column :#{table}, :#{column}, :#{column_type}, default: #{column_default} }
               end
             end
         MESSAGE

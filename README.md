@@ -248,23 +248,23 @@ end
 
 ## Disabling "zero downtime migration" enforcements
 
-We can disable any of these "zero downtime migration" enforcements by wrapping them in a `safety_assured` block.
+We can disable any of these "zero downtime migration" enforcements by wrapping them in a `disable_safety_checks!` block.
 
 ```ruby
 class AddPublishedToPosts < ActiveRecord::Migration
   def change
-    safety_assured do
+    disable_safety_checks! do
       add_column :posts, :published, :boolean, default: true
     end
   end
 end
 ```
 
-We can also mark an entire migration as safe by using the `safety_assured` helper method.
+We can also mark an entire migration as safe by using the `disable_safety_checks!` helper method.
 
 ```ruby
 class AddPublishedToPosts < ActiveRecord::Migration
-  safety_assured
+  disable_safety_checks!
 
   def change
     add_column :posts, :published, :boolean

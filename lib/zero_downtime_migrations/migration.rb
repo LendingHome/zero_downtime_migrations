@@ -103,6 +103,11 @@ module ZeroDowntimeMigrations
       Migration.safe = safe
     end
 
+    def safety_assured(&block)
+      warn "DEPRECATED: calling safety_assured is deprecated. Please use disable_safety_checks! instead."
+      disable_safety_checks!(&block)
+    end
+
     def validate(type, *args)
       Validation.validate!(type, *args)
     rescue UndefinedValidationError

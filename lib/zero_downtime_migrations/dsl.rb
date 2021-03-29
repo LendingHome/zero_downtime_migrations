@@ -23,11 +23,22 @@ module ZeroDowntimeMigrations
     end
 
     def safe?
-      !!@safe || ENV["DISABLE_SAFETY_CHECKS"].presence
+      !!@safe || begin
+        if ENV["SAFETY_ASSURED"].presence
+          warn "DEPRECATED: setting SAFETY_ASSURED is deprecated. Please use DISABLE_SAFETY_CHECKS instead."
+        end
+
+        ENV["DISABLE_SAFETY_CHECKS"].presence || ENV["SAFETY_ASSURED"].presence
+      end
     end
 
     def disable_safety_checks!
       Migration.safe = true
+    end
+
+    def safety_assured
+      warn "DEPRECATED: calling safety_assured is deprecated. Please use disable_safety_checks! instead."
+      disable_safety_checks!
     end
 
     def unsafe?

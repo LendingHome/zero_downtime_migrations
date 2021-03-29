@@ -273,10 +273,10 @@ class AddPublishedToPosts < ActiveRecord::Migration
 end
 ```
 
-Enforcements can be globally disabled by setting `ENV["SAFETY_ASSURED"]` when running migrations.
+Enforcements can be globally disabled by setting `ENV["DISABLE_SAFETY_CHECKS"]` when running migrations.
 
 ```bash
-SAFETY_ASSURED=1 bundle exec rake db:migrate --trace
+DISABLE_SAFETY_CHECKS=1 bundle exec rake db:migrate --trace
 ```
 
 These enforcements are **automatically disabled by default for the following scenarios**:

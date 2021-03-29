@@ -23,7 +23,7 @@ module ZeroDowntimeMigrations
     end
 
     def safe?
-      !!@safe || ENV["SAFETY_ASSURED"].presence
+      !!@safe || ENV["DISABLE_SAFETY_CHECKS"].presence
     end
 
     def disable_safety_checks!

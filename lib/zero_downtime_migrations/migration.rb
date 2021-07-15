@@ -82,6 +82,8 @@ module ZeroDowntimeMigrations
       validate(method, *args)
       super
     end
+    ruby2_keywords(:method_missing) if respond_to?(:ruby2_keywords, true)
+
 
     def old_migration?
       version && version <= ENV["ZERO_DOWNTIME_MIGRATIONS_LAST_UNSAFE_VERSION"].to_i

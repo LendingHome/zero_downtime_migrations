@@ -10,28 +10,12 @@ if [[ -z "$DOCKER" ]]; then
   echo "commit: $BUILDKITE_COMMIT"
   echo "image: $DOCKER_IMAGE"
 
-  if [ -v REBUILD_CACHE ]; then
-    echo "--- :minidisc: Pulling images"
-    docker-compose pull --ignore-pull-failures
-  fi
-
   echo "--- :docker: Starting docker"
   docker --version
   docker-compose --version
 
   echo "Building $DOCKER_IMAGE"
   docker-compose run app /app/bin/test $@
-
-  if [ -v REBUILD_CACHE ]; then
-    echo "--- :recycle: Updating build cache"
-    echo "The build was triggered with REBUILD_CACHE"
-
-    echo "Generating cache.tar.lz4"
-    tar -c --use-compress-program=lz4 -f cache.tar.lz4 "$BUILD_CACHE" \
-      || echo "Ignoring permission denied failures"
-
-    [ -v BUILDKITE ] && buildkite-agent meta-data set "rebuild-cache" "1"
-  fi
 
   exit 0
 fi
@@ -61,8 +45,7 @@ echo "--- :postgres: Creating database"
 sleep 3 # give postgres container time to boot
 createdb -h postgres -U postgres -w zero_downtime_migrations || true
 
-if [[ -z "$REBUILD_CACHE" ]]; then
-  echo "+++ :rspec: Running rspec tests"
-  echo "rspec $(bundle exec rspec --version)"
-  bundle exec rspec $@
-fi
+echo "+++ :rspec: Running rspec tests"
+echo "rspec $(bundle exec rspec --version)"
+bundle exec rspec $@
+bundle exec codeclimate-test-reporter

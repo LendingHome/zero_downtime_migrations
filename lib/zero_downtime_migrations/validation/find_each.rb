@@ -20,7 +20,7 @@ module ZeroDowntimeMigrations
           call to `each` in a `safety_assured` block.
 
             class #{migration_name} < ActiveRecord::Migration
-              def change
+              def up
                 safety_assured do
                   # use ActiveRecord::Relation.each in this block
                 end

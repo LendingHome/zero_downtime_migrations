@@ -1,7 +1,7 @@
-# ![LendingHome](https://cloud.githubusercontent.com/assets/2419/19467866/7efa93a8-94c8-11e6-93e7-4375dbb8a7bc.png) zero_downtime_migrations
+# ![LendingHome](https://avatars0.githubusercontent.com/u/5448482?s=24&v=4) zero_downtime_migrations
 [![Code Climate](https://codeclimate.com/github/LendingHome/zero_downtime_migrations/badges/gpa.svg)](https://codeclimate.com/github/LendingHome/zero_downtime_migrations) [![Coverage](https://codeclimate.com/github/LendingHome/zero_downtime_migrations/badges/coverage.svg)](https://codeclimate.com/github/LendingHome/zero_downtime_migrations) [![Gem Version](https://badge.fury.io/rb/zero_downtime_migrations.svg)](http://badge.fury.io/rb/zero_downtime_migrations)
 
-> Zero downtime migrations with ActiveRecord and PostgreSQL.
+> Zero downtime migrations with ActiveRecord 3+ and PostgreSQL.
 
 Catch problematic migrations at development/test time! Heavily inspired by these similar projects:
 
@@ -39,7 +39,7 @@ These exceptions display clear instructions of how to perform the same operation
 This can take a long time with significant database size or traffic and lock your table!
 
 ```ruby
-class AddPublishedToPosts < ActiveRecord::Migration[5.0]
+class AddPublishedToPosts < ActiveRecord::Migration
   def change
     add_column :posts, :published, :boolean, default: true
   end
@@ -51,7 +51,7 @@ end
 First let’s add the column without a default. When we add a column with a default it has to lock the table while it performs an UPDATE for ALL rows to set this new default.
 
 ```ruby
-class AddPublishedToPosts < ActiveRecord::Migration[5.0]
+class AddPublishedToPosts < ActiveRecord::Migration
   def change
     add_column :posts, :published, :boolean
   end
@@ -61,9 +61,9 @@ end
 Then we’ll set the new column default in a separate migration. Note that this does not update any existing data! This only sets the default for newly inserted rows going forward.
 
 ```ruby
-class SetPublishedDefaultOnPosts < ActiveRecord::Migration[5.0]
+class SetPublishedDefaultOnPosts < ActiveRecord::Migration
   def change
-    change_column_default :posts, :published, true
+    change_column_default :posts, :published, from: nil, to: true
   end
 end
 ```
@@ -71,11 +71,13 @@ end
 Finally we’ll backport the default value for existing data in batches. This should be done in its own migration as well. Updating in batches allows us to lock 1000 rows at a time (or whatever batch size we prefer).
 
 ```ruby
-class BackportPublishedDefaultOnPosts < ActiveRecord::Migration[5.0]
-  def change
-    Post.select(:id).find_in_batches.with_index do |batch, index|
-      puts "Processing batch #{index}\r"
-      Post.where(id: batch).update_all(published: true)
+class BackportPublishedDefaultOnPosts < ActiveRecord::Migration
+  def up
+    say_with_time "Backport posts.published default" do
+      Post.unscoped.select(:id).find_in_batches.with_index do |batch, index|
+        say("Processing batch #{index}\r", true)
+        Post.unscoped.where(id: batch).update_all(published: true)
+      end
     end
   end
 end
@@ -88,7 +90,7 @@ end
 This action can lock your database table while indexing existing data!
 
 ```ruby
-class IndexUsersOnEmail < ActiveRecord::Migration[5.0]
+class IndexUsersOnEmail < ActiveRecord::Migration
   def change
     add_index :users, :email
   end
@@ -102,7 +104,7 @@ Instead, let's add the index concurrently in its own migration with the DDL tran
 This allows PostgreSQL to build the index without locking in a way that prevent concurrent inserts, updates, or deletes on the table. Standard indexes lock out writes (but not reads) on the table.
 
 ```ruby
-class IndexUsersOnEmail < ActiveRecord::Migration[5.0]
+class IndexUsersOnEmail < ActiveRecord::Migration
   disable_ddl_transaction!
 
   def change
@@ -118,10 +120,10 @@ end
 Performing migrations that change the schema, update data, or add indexes within one big transaction is unsafe!
 
 ```ruby
-class AddPublishedToPosts < ActiveRecord::Migration[5.0]
+class AddPublishedToPosts < ActiveRecord::Migration
   def change
     add_column :posts, :published, :boolean
-    Post.update_all(published: true)
+    Post.unscoped.update_all(published: true)
     add_index :posts, :published
   end
 end
@@ -136,7 +138,7 @@ Instead, let's split apart these types of migrations into separate files.
 * Add indexes concurrently within their own file as well. Indexes should be created without the DDL transaction enabled to avoid table locking.
 
 ```ruby
-class AddPublishedToPosts < ActiveRecord::Migration[5.0]
+class AddPublishedToPosts < ActiveRecord::Migration
   def change
     add_column :posts, :published, :boolean
   end
@@ -144,15 +146,15 @@ end
 ```
 
 ```ruby
-class BackportPublishedOnPosts < ActiveRecord::Migration[5.0]
-  def change
-    Post.update_all(published: true)
+class BackportPublishedOnPosts < ActiveRecord::Migration
+  def up
+    Post.unscoped.update_all(published: true)
   end
 end
 ```
 
 ```ruby
-class IndexPublishedOnPosts < ActiveRecord::Migration[5.0]
+class IndexPublishedOnPosts < ActiveRecord::Migration
   disable_ddl_transaction!
 
   def change
@@ -168,7 +170,7 @@ end
 The DDL transaction should only be disabled for migrations that add indexes. All other types of migrations should keep the DDL transaction enabled so that changes can be rolled back if any unexpected errors occur.
 
 ```ruby
-class AddPublishedToPosts < ActiveRecord::Migration[5.0]
+class AddPublishedToPosts < ActiveRecord::Migration
   disable_ddl_transaction!
 
   def change
@@ -178,11 +180,11 @@ end
 ```
 
 ```ruby
-class UpdatePublishedOnPosts < ActiveRecord::Migration[5.0]
+class UpdatePublishedOnPosts < ActiveRecord::Migration
   disable_ddl_transaction!
 
-  def change
-    Post.update_all(published: true)
+  def up
+    Post.unscoped.update_all(published: true)
   end
 end
 ```
@@ -192,7 +194,7 @@ end
 Any other data or schema changes must live in their own migration files with the DDL transaction enabled just in case they make changes that need to be rolled back.
 
 ```ruby
-class AddPublishedToPosts < ActiveRecord::Migration[5.0]
+class AddPublishedToPosts < ActiveRecord::Migration
   def change
     add_column :posts, :published, :boolean
   end
@@ -200,9 +202,9 @@ end
 ```
 
 ```ruby
-class UpdatePublishedOnPosts < ActiveRecord::Migration[5.0]
-  def change
-    Post.update_all(published: true)
+class UpdatePublishedOnPosts < ActiveRecord::Migration
+  def up
+    Post.unscoped.update_all(published: true)
   end
 end
 ```
@@ -214,9 +216,9 @@ end
 This might accidentally load tens or hundreds of thousands of records into memory all at the same time!
 
 ```ruby
-class BackportPublishedDefaultOnPosts < ActiveRecord::Migration[5.0]
-  def change
-    Post.all.each do |post|
+class BackportPublishedDefaultOnPosts < ActiveRecord::Migration
+  def up
+    Post.unscoped.each do |post|
       post.update_attribute(published: true)
     end
   end
@@ -228,48 +230,11 @@ end
 Let's use the `find_each` method to fetch records in batches instead.
 
 ```ruby
-class BackportPublishedDefaultOnPosts < ActiveRecord::Migration[5.0]
-  def change
-    Post.all.find_each do |post|
+class BackportPublishedDefaultOnPosts < ActiveRecord::Migration
+  def up
+    Post.unscoped.find_each do |post|
       post.update_attribute(published: true)
     end
-  end
-end
-```
-
-### Renaming a column
-
-#### Bad
-```ruby
-class AddPublishedToPosts < ActiveRecord::Migration[5.0]
-  def change
-    rename_column :posts, :published, :published_new_name
-  end
-end
-```
-
-#### Good
-* Introduce schema changes with methods like `create_table` or `add_column`
-* Copy data with methods like `update_all`
-* Introduce code to write to both columns
-* Deploy
-* Add code to stop writing to original column
-* Deploy
-* Drop the column in last separate deploy
-
-```ruby
-class AddPublishedToPosts < ActiveRecord::Migration[5.0]
-  def change
-    add_column :posts, :published_DEPRECATED, :boolean  #published is original column
-    Post.update_all("\"published_DEPRECATED\"=published") #need to quote capitals in postgres
-  end
-end
-```
-
-```ruby
-class CopyPublishedDataOnPosts < ActiveRecord::Migration[5.0]
-  def change
-    remove_column :posts, :published
   end
 end
 ```
@@ -278,6 +243,7 @@ end
 
 * Changing a column type
 * Removing a column
+* Renaming a column
 * Renaming a table
 
 ## Disabling "zero downtime migration" enforcements
@@ -285,7 +251,7 @@ end
 We can disable any of these "zero downtime migration" enforcements by wrapping them in a `safety_assured` block.
 
 ```ruby
-class AddPublishedToPosts < ActiveRecord::Migration[5.0]
+class AddPublishedToPosts < ActiveRecord::Migration
   def change
     safety_assured do
       add_column :posts, :published, :boolean, default: true
@@ -297,12 +263,12 @@ end
 We can also mark an entire migration as safe by using the `safety_assured` helper method.
 
 ```ruby
-class AddPublishedToPosts < ActiveRecord::Migration[5.0]
+class AddPublishedToPosts < ActiveRecord::Migration
   safety_assured
 
   def change
     add_column :posts, :published, :boolean
-    Post.where("created_at >= ?", 1.day.ago).update_all(published: true)
+    Post.unscoped.where("created_at >= ?", 1.day.ago).update_all(published: true)
   end
 end
 ```

@@ -6,7 +6,7 @@ module ZeroDowntimeMigrations
       mod.singleton_class.prepend(DSL)
     end
 
-    def initialize(*)
+    def initialize(*, **)
       ActiveRecord::Base.send(:prepend, Data)
       ActiveRecord::Relation.send(:prepend, Relation)
       super
@@ -16,7 +16,7 @@ module ZeroDowntimeMigrations
       !!disable_ddl_transaction
     end
 
-    def define(*)
+    def define(*, **)
       Migration.current = self
       Migration.safe = true
       super.tap { Migration.current = nil }
@@ -76,10 +76,10 @@ module ZeroDowntimeMigrations
       %i(add_index).include?(method)
     end
 
-    def method_missing(method, *args)
+    def method_missing(method, *args, **hargs)
       Migration.ddl = true if ddl_method?(method)
       Migration.index = true if index_method?(method)
-      validate(method, *args)
+      validate(method, *args, **hargs)
       super
     end
 
@@ -103,8 +103,8 @@ module ZeroDowntimeMigrations
       Migration.safe = safe
     end
 
-    def validate(type, *args)
-      Validation.validate!(type, *args)
+    def validate(type, *args, **hargs)
+      Validation.validate!(type, *args, **hargs)
     rescue UndefinedValidationError
       nil
     end

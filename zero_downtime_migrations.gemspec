@@ -11,7 +11,7 @@ Gem::Specification.new do |s|
   s.required_ruby_version = ">= 2.0.0"
   s.summary               = "Zero downtime migrations with ActiveRecord and PostgreSQL"
   s.test_files            = `git ls-files -- spec/*`.split("\n")
-  s.version               = "0.0.7"
+  s.version               = "0.0.8"
 
   s.add_dependency "activerecord"
 end
